@@ -1,0 +1,446 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Система тестирования сотрудников</title>
+    <style>
+        /* Base styles */
+body {
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: #f5f7fa;
+    margin: 0;
+    padding: 20px;
+    min-height: 100vh;
+    line-height: 1.6;
+}
+
+.card {
+    background: white;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+h1 {
+    color: #1a365d;
+    font-size: 2rem;
+    margin: 0;
+}
+
+h2 {
+    color: #2d3748;
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Form elements */
+input[type="text"], select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+    margin-bottom: 1rem;
+}
+
+input[type="text"]:focus, select:focus {
+    outline: none;
+    border-color: #4299e1;
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+}
+
+button {
+    background-color: #4299e1;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+button:hover:not(:disabled) {
+    background-color: #3182ce;
+}
+
+button:disabled {
+    background-color: #a0aec0;
+    cursor: not-allowed;
+}
+
+/* Questions styling */
+.question {
+    background: #f8fafc;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+}
+
+.question p {
+    margin-top: 0;
+    color: #2d3748;
+}
+
+.radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.radio-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.radio-option input[type="radio"] {
+    width: 1.25rem;
+    height: 1.25rem;
+    cursor: pointer;
+}
+
+.radio-option label {
+    cursor: pointer;
+    color: #4a5568;
+}
+
+/* Modal styling */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: white;
+    margin: 15% auto;
+    padding: 2rem;
+    border-radius: 12px;
+    max-width: 600px;
+    position: relative;
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+.close-button {
+    margin-top: 1rem;
+    width: 100%;
+}
+
+/* Results styling */
+.error-item {
+    background: #fff5f5;
+    border-left: 4px solid #fc8181;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 0 8px 8px 0;
+}
+
+.user-answer {
+    color: #e53e3e;
+    margin: 0.5rem 0;
+}
+
+.correct-answer {
+    color: #38a169;
+    margin: 0.5rem 0;
+}
+
+.explanation {
+    background: #f7fafc;
+    padding: 1rem;
+    border-radius: 6px;
+    margin-top: 0.5rem;
+}
+
+/* Utility classes */
+.hidden {
+    display: none;
+}
+
+.space-y-4 > * + * {
+    margin-top: 1rem;
+}
+
+.space-y-6 > * + * {
+    margin-top: 1.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+    body {
+        padding: 10px;
+    }
+
+    .card {
+        padding: 1rem;
+    }
+
+    .modal-content {
+        margin: 10% 1rem;
+    }
+}
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="card-header">
+            <h1>Система тестирования сотрудников</h1>
+        </div>
+
+        <div id="step1" class="space-y-4">
+            <h2>Персональные данные</h2>
+            <input type="text" id="fullName" placeholder="Введите ФИО">
+            <button onclick="nextStep(1)" id="step1Button" disabled>Далее</button>
+        </div>
+
+        <div id="step2" class="space-y-4 hidden">
+            <h2>Выберите должность</h2>
+            <select id="position">
+                <option value="">Выберите должность</option>
+                {% for position in positions %}
+                    <option value="{{ position.id }}">{{ position.name }}</option>
+                {% endfor %}
+            </select>
+            <button onclick="nextStep(2)" id="step2Button" disabled>Начать тест</button>
+        </div>
+
+        <div id="step3" class="space-y-6 hidden">
+            <h2>Тестирование</h2>
+            <div id="questions"></div>
+            <button onclick="calculateResults()" id="step3Button" disabled>Завершить тест</button>
+        </div>
+
+        <div id="step4" class="space-y-4 hidden">
+            <h2>Результаты тестирования</h2>
+            <div id="results"></div>
+            <button onclick="resetTest()">Пройти тест заново</button>
+        </div>
+    </div>
+
+    <div id="explanationModal" class="modal">
+        <div class="modal-content">
+            <div id="explanationText"></div>
+            <button onclick="closeExplanation()" class="close-button">Понятно</button>
+        </div>
+    </div>
+
+    <script>
+        let questions = [];
+        let formData = {
+            fullName: '',
+            position: '',
+            answers: []
+        };
+
+        document.getElementById('fullName').addEventListener('input', function(e) {
+            formData.fullName = e.target.value;
+            document.getElementById('step1Button').disabled = !formData.fullName;
+        });
+
+        document.getElementById('position').addEventListener('change', function(e) {
+            formData.position = e.target.value;
+            document.getElementById('step2Button').disabled = !formData.position;
+        });
+
+        async function loadQuestions() {
+            try {
+                const response = await fetch(`/api/questions/?position_id=${formData.position}`);
+                const data = await response.json();
+                questions = data.questions;
+                renderQuestions();
+            } catch (error) {
+                console.error('Error loading questions:', error);
+            }
+        }
+
+        function showStep(stepNumber) {
+            for (let i = 1; i <= 4; i++) {
+                document.getElementById(`step${i}`).classList.add('hidden');
+            }
+            document.getElementById(`step${stepNumber}`).classList.remove('hidden');
+        }
+
+        async function nextStep(currentStep) {
+            showStep(currentStep + 1);
+            if (currentStep === 2) {
+                await loadQuestions();
+            }
+        }
+
+        function renderQuestions() {
+            const questionsContainer = document.getElementById('questions');
+            questionsContainer.innerHTML = questions.map(question => `
+                <div class="question">
+                    <p class="font-medium">${question.text}</p>
+                    <div class="radio-group">
+                        ${question.options.map(option => `
+                            <div class="radio-option">
+                                <input type="radio"
+                                    name="question-${question.id}"
+                                    value="${option}"
+                                    onchange="handleAnswerSelect(${question.id}, '${option}')"
+                                >
+                                <label>${option}</label>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function handleAnswerSelect(questionId, answer) {
+            formData.answers = formData.answers.filter(a => a.questionId !== questionId);
+            formData.answers.push({ questionId, answer });
+            document.getElementById('step3Button').disabled = formData.answers.length !== questions.length;
+
+            const question = questions.find(q => q.id === questionId);
+            showExplanation(question.explanation);
+        }
+
+        function showExplanation(explanation) {
+            const modal = document.getElementById('explanationModal');
+            const explanationText = document.getElementById('explanationText');
+            explanationText.innerHTML = `
+                <h3>Пояснение:</h3>
+                <div class="explanation">${explanation}</div>
+            `;
+            modal.style.display = 'block';
+        }
+
+        function closeExplanation() {
+            const modal = document.getElementById('explanationModal');
+            modal.style.display = 'none';
+        }
+
+        async function calculateResults() {
+            const results = {
+                total: questions.length,
+                correct: 0,
+                incorrect: []
+            };
+
+            formData.answers.forEach(answer => {
+                const question = questions.find(q => q.id === answer.questionId);
+                if (question.correctAnswer === answer.answer) {
+                    results.correct += 1;
+                } else {
+                    results.incorrect.push({
+                        question: question.text,
+                        userAnswer: answer.answer,
+                        correctAnswer: question.correctAnswer,
+                        explanation: question.explanation
+                    });
+                }
+            });
+
+            // Сохраняем результат
+            try {
+                await fetch('/api/save-result/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({
+                        fullName: formData.fullName,
+                        position: formData.position,
+                        correct: results.correct,
+                        total: results.total
+                    })
+                });
+            } catch (error) {
+                console.error('Error saving results:', error);
+            }
+
+            const resultsContainer = document.getElementById('results');
+            resultsContainer.innerHTML = `
+                <div>
+                    <p class="font-medium">ФИО: ${formData.fullName}</p>
+                    <p class="font-medium">Должность: ${document.getElementById('position').options[document.getElementById('position').selectedIndex].text}</p>
+                    <p class="font-medium">
+                        Правильных ответов: ${results.correct} из ${results.total}
+                        (${((results.correct / results.total) * 100).toFixed(1)}%)
+                    </p>
+                </div>
+                ${results.incorrect.length > 0 ? `
+                    <div class="mt-4">
+                        <h3>Ошибки:</h3>
+                        ${results.incorrect.map(error => `
+                            <div class="error-item">
+                                <p>Вопрос: ${error.question}</p>
+                                <p class="user-answer">Ваш ответ: ${error.userAnswer}</p>
+                                <p class="correct-answer">Правильный ответ: ${error.correctAnswer}</p>
+                                <div class="explanation">
+                                    <strong>Пояснение:</strong><br>
+                                    ${error.explanation}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+            `;
+
+            showStep(4);
+        }
+
+        function resetTest() {
+            formData = {
+                fullName: '',
+                position: '',
+                answers: []
+            };
+            document.getElementById('fullName').value = '';
+            document.getElementById('position').value = '';
+            document.getElementById('step1Button').disabled = true;
+            document.getElementById('step2Button').disabled = true;
+            document.getElementById('step3Button').disabled = true;
+            showStep(1);
+        }
+
+        // Get CSRF token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Initialize
+        showStep(1);
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('explanationModal');
+            if (event.target == modal) {
+                closeExplanation();
+            }
+        }
+    </script>
+</body>
+</html>
