@@ -22,17 +22,25 @@ class Question(models.Model):
         verbose_name = "Вопрос"
         verbose_name_plural = "Вопросы"
 
+
 class Option(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='options', verbose_name="Вопрос")
     text = models.CharField(max_length=255, verbose_name="Текст варианта")
     is_correct = models.BooleanField(default=False, verbose_name="Правильный ответ")
 
-    def __str__(self):
-        return f"{self.text} ({'Правильный' if self.is_correct else 'Неправильный'})"
-
     class Meta:
         verbose_name = "Вариант ответа"
         verbose_name_plural = "Варианты ответов"
+        unique_together = [('question', 'is_correct', 'text')]  # Предотвращаем дубликаты
+
+    def __str__(self):
+        return f"{self.text} ({'Правильный' if self.is_correct else 'Неправильный'})"
+
+    def save(self, *args, **kwargs):
+        if self.is_correct:
+            # Сбрасываем флаг is_correct у других вариантов этого вопроса
+            Option.objects.filter(question=self.question).update(is_correct=False)
+        super().save(*args, **kwargs)
 
 class TestResult(models.Model):
     full_name = models.CharField(max_length=255, verbose_name="ФИО")

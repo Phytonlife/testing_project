@@ -7,196 +7,151 @@
     <title>Система тестирования сотрудников</title>
     <style>
         /* Base styles */
-body {
-    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
-    background-color: #f5f7fa;
-    margin: 0;
-    padding: 20px;
-    min-height: 100vh;
-    line-height: 1.6;
-}
+        body {
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-.card {
-    background: white;
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 2rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
+        .card {
+            background: white;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+        }
 
-.card-header {
-    text-align: center;
-    margin-bottom: 2rem;
-    padding-bottom: 1rem;
-    border-bottom: 2px solid #e5e7eb;
-}
+        .card-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
 
-h1 {
-    color: #1a365d;
-    font-size: 2rem;
-    margin: 0;
-}
+        h1, h2 {
+            color: #1a365d;
+            margin: 0 0 1rem 0;
+        }
 
-h2 {
-    color: #2d3748;
-    font-size: 1.5rem;
-    margin-bottom: 1.5rem;
-}
+        /* Form elements */
+        input[type="text"],
+        select,
+        button {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
 
-/* Form elements */
-input[type="text"], select {
-    width: 100%;
-    padding: 0.75rem;
-    border: 2px solid #e2e8f0;
-    border-radius: 6px;
-    font-size: 1rem;
-    transition: border-color 0.2s;
-    margin-bottom: 1rem;
-}
+        button {
+            background-color: #4299e1;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
 
-input[type="text"]:focus, select:focus {
-    outline: none;
-    border-color: #4299e1;
-    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
-}
+        button:hover:not(:disabled) {
+            background-color: #3182ce;
+        }
 
-button {
-    background-color: #4299e1;
-    color: white;
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 6px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
+        button:disabled {
+            background-color: #a0aec0;
+            cursor: not-allowed;
+        }
 
-button:hover:not(:disabled) {
-    background-color: #3182ce;
-}
+        /* Question styling */
+        .question-card {
+            background: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
 
-button:disabled {
-    background-color: #a0aec0;
-    cursor: not-allowed;
-}
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
 
-/* Questions styling */
-.question {
-    background: #f8fafc;
-    padding: 1.5rem;
-    border-radius: 8px;
-    margin-bottom: 1.5rem;
-}
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
 
-.question p {
-    margin-top: 0;
-    color: #2d3748;
-}
+        .radio-option input[type="radio"] {
+            width: 1.25rem;
+            height: 1.25rem;
+            cursor: pointer;
+        }
 
-.radio-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-}
+        .radio-option label {
+            cursor: pointer;
+        }
 
-.radio-option {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
+        /* Utility classes */
+        .hidden {
+            display: none !important;
+        }
 
-.radio-option input[type="radio"] {
-    width: 1.25rem;
-    height: 1.25rem;
-    cursor: pointer;
-}
+        /* Results styling */
+        .error-item {
+            background: #fff5f5;
+            border-left: 4px solid #fc8181;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 0 8px 8px 0;
+        }
 
-.radio-option label {
-    cursor: pointer;
-    color: #4a5568;
-}
+        .user-answer {
+            color: #e53e3e;
+            margin: 0.5rem 0;
+        }
 
-/* Modal styling */
-.modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 1000;
-}
+        .correct-answer {
+            color: #38a169;
+            margin: 0.5rem 0;
+        }
 
-.modal-content {
-    background-color: white;
-    margin: 15% auto;
-    padding: 2rem;
-    border-radius: 12px;
-    max-width: 600px;
-    position: relative;
-    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-}
+        .explanation {
+            background: #f7fafc;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-top: 0.5rem;
+        }
 
-.close-button {
-    margin-top: 1rem;
-    width: 100%;
-}
+        /* Responsive adjustments */
+        @media (max-width: 640px) {
+            .card {
+                padding: 1rem;
+                margin: 0 10px;
+            }
+        }
 
-/* Results styling */
-.error-item {
-    background: #fff5f5;
-    border-left: 4px solid #fc8181;
-    padding: 1rem;
-    margin-bottom: 1rem;
-    border-radius: 0 8px 8px 0;
-}
 
-.user-answer {
-    color: #e53e3e;
-    margin: 0.5rem 0;
-}
 
-.correct-answer {
-    color: #38a169;
-    margin: 0.5rem 0;
-}
+          .navigation-buttons {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 1rem;
+        }
 
-.explanation {
-    background: #f7fafc;
-    padding: 1rem;
-    border-radius: 6px;
-    margin-top: 0.5rem;
-}
-
-/* Utility classes */
-.hidden {
-    display: none;
-}
-
-.space-y-4 > * + * {
-    margin-top: 1rem;
-}
-
-.space-y-6 > * + * {
-    margin-top: 1.5rem;
-}
-
-/* Responsive adjustments */
-@media (max-width: 640px) {
-    body {
-        padding: 10px;
-    }
-
-    .card {
-        padding: 1rem;
-    }
-
-    .modal-content {
-        margin: 10% 1rem;
-    }
-}
+        .navigation-buttons button {
+            margin-left: 0.5rem;
+        }
     </style>
 </head>
 <body>
@@ -225,7 +180,6 @@ button:disabled {
         <div id="step3" class="space-y-6 hidden">
             <h2>Тестирование</h2>
             <div id="questions"></div>
-            <button onclick="calculateResults()" id="step3Button" disabled>Завершить тест</button>
         </div>
 
         <div id="step4" class="space-y-4 hidden">
@@ -235,14 +189,8 @@ button:disabled {
         </div>
     </div>
 
-    <div id="explanationModal" class="modal">
-        <div class="modal-content">
-            <div id="explanationText"></div>
-            <button onclick="closeExplanation()" class="close-button">Понятно</button>
-        </div>
-    </div>
-
     <script>
+        let currentQuestionIndex = 0;
         let questions = [];
         let formData = {
             fullName: '',
@@ -251,7 +199,7 @@ button:disabled {
         };
 
         document.getElementById('fullName').addEventListener('input', function(e) {
-            formData.fullName = e.target.value;
+            formData.fullName = e.target.value.trim();
             document.getElementById('step1Button').disabled = !formData.fullName;
         });
 
@@ -260,17 +208,6 @@ button:disabled {
             document.getElementById('step2Button').disabled = !formData.position;
         });
 
-        async function loadQuestions() {
-            try {
-                const response = await fetch(`/api/questions/?position_id=${formData.position}`);
-                const data = await response.json();
-                questions = data.questions;
-                renderQuestions();
-            } catch (error) {
-                console.error('Error loading questions:', error);
-            }
-        }
-
         function showStep(stepNumber) {
             for (let i = 1; i <= 4; i++) {
                 document.getElementById(`step${i}`).classList.add('hidden');
@@ -278,56 +215,88 @@ button:disabled {
             document.getElementById(`step${stepNumber}`).classList.remove('hidden');
         }
 
-        async function nextStep(currentStep) {
+        function nextStep(currentStep) {
             showStep(currentStep + 1);
             if (currentStep === 2) {
-                await loadQuestions();
+                loadQuestions();
             }
         }
 
-        function renderQuestions() {
-            const questionsContainer = document.getElementById('questions');
-            questionsContainer.innerHTML = questions.map(question => `
-                <div class="question">
-                    <p class="font-medium">${question.text}</p>
-                    <div class="radio-group">
-                        ${question.options.map(option => `
-                            <div class="radio-option">
-                                <input type="radio"
-                                    name="question-${question.id}"
-                                    value="${option}"
-                                    onchange="handleAnswerSelect(${question.id}, '${option}')"
-                                >
-                                <label>${option}</label>
-                            </div>
-                        `).join('')}
+   function renderCurrentQuestion() {
+    const questionsContainer = document.getElementById('questions');
+    const currentQuestion = questions[currentQuestionIndex];
+
+    questionsContainer.innerHTML = `
+        <div class="question-card">
+            <p class="font-medium">Вопрос ${currentQuestionIndex + 1} из ${questions.length}: ${currentQuestion.text}</p>
+            <div class="radio-group">
+                ${currentQuestion.options.map(option => `
+                    <div class="radio-option">
+                        <input type="radio"
+                            name="current-question"
+                            value="${option}"
+                            onchange="selectAnswer('${option}')"
+                        >
+                        <label>${option}</label>
                     </div>
-                </div>
-            `).join('');
+                `).join('')}
+            </div>
+            <div class="navigation-buttons mt-4">
+                <button onclick="goToNextQuestion()" id="nextQuestionBtn" disabled>
+                    ${currentQuestionIndex < questions.length - 1 ? 'Следующий вопрос' : 'Завершить тест'}
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+        function selectAnswer(answer) {
+            const currentQuestion = questions[currentQuestionIndex];
+
+            // Разрешаем кнопку "Далее" после выбора ответа
+            document.getElementById('nextQuestionBtn').disabled = false;
+
+            // Сохраняем текущий ответ
+            formData.answers[currentQuestionIndex] = {
+                questionId: currentQuestion.id,
+                answer: answer
+            };
         }
 
-        function handleAnswerSelect(questionId, answer) {
-            formData.answers = formData.answers.filter(a => a.questionId !== questionId);
-            formData.answers.push({ questionId, answer });
-            document.getElementById('step3Button').disabled = formData.answers.length !== questions.length;
+        function goToNextQuestion() {
+            // Проверяем, что на текущий вопрос дан ответ
+            if (!formData.answers[currentQuestionIndex]) {
+                alert('Пожалуйста, выберите ответ');
+                return;
+            }
 
-            const question = questions.find(q => q.id === questionId);
-            showExplanation(question.explanation);
+            // Если это последний вопрос, завершаем тест
+            if (currentQuestionIndex === questions.length - 1) {
+                calculateResults();
+                return;
+            }
+
+            // Переход к следующему вопросу
+            currentQuestionIndex++;
+            renderCurrentQuestion();
         }
 
-        function showExplanation(explanation) {
-            const modal = document.getElementById('explanationModal');
-            const explanationText = document.getElementById('explanationText');
-            explanationText.innerHTML = `
-                <h3>Пояснение:</h3>
-                <div class="explanation">${explanation}</div>
-            `;
-            modal.style.display = 'block';
-        }
+        async function loadQuestions() {
+            try {
+                const response = await fetch(`/api/questions/?position_id=${formData.position}`);
+                const data = await response.json();
+                questions = data.questions;
 
-        function closeExplanation() {
-            const modal = document.getElementById('explanationModal');
-            modal.style.display = 'none';
+                // Сбрасываем индекс вопроса и очищаем ответы
+                currentQuestionIndex = 0;
+                formData.answers = [];
+
+                // Рендерим первый вопрос
+                renderCurrentQuestion();
+            } catch (error) {
+                console.error('Ошибка загрузки вопросов:', error);
+                alert('Не удалось загрузить вопросы. Пожалуйста, попробуйте позже.');
+            }
         }
 
         async function calculateResults() {
@@ -367,7 +336,7 @@ button:disabled {
                     })
                 });
             } catch (error) {
-                console.error('Error saving results:', error);
+                console.error('Ошибка сохранения результатов:', error);
             }
 
             const resultsContainer = document.getElementById('results');
@@ -411,11 +380,9 @@ button:disabled {
             document.getElementById('position').value = '';
             document.getElementById('step1Button').disabled = true;
             document.getElementById('step2Button').disabled = true;
-            document.getElementById('step3Button').disabled = true;
             showStep(1);
         }
 
-        // Get CSRF token
         function getCookie(name) {
             let cookieValue = null;
             if (document.cookie && document.cookie !== '') {
@@ -431,16 +398,8 @@ button:disabled {
             return cookieValue;
         }
 
-        // Initialize
+        // Инициализация
         showStep(1);
-
-        // Close modal when clicking outside
-        window.onclick = function(event) {
-            const modal = document.getElementById('explanationModal');
-            if (event.target == modal) {
-                closeExplanation();
-            }
-        }
     </script>
 </body>
 </html>
